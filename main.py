@@ -40,9 +40,27 @@ def looks_like_latex(s: str) -> bool:
 
 def normalize_plain_expr(s: str) -> str:
     s = s.strip()
+
+    # توحيد الأسس
     s = s.replace("^", "**")
     s = s.replace("²", "**2").replace("³", "**3")
+
+    # إزالة المسافات
     s = re.sub(r"\s+", "", s)
+
+    # ✅ إصلاح الضرب الضمني:
+    # 12x -> 12*x
+    s = re.sub(r"(\d)([a-zA-Z])", r"\1*\2", s)
+
+    # x2 -> x*2 (نادراً لكنها تحصل)
+    s = re.sub(r"([a-zA-Z])(\d)", r"\1*\2", s)
+
+    # )x -> )*x
+    s = re.sub(r"\)([a-zA-Z])", r")*\1", s)
+
+    # x( -> x*( 
+    s = re.sub(r"([a-zA-Z])\(", r"\1*(", s)
+
     return s
 
 
